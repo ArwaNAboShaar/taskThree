@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\TaskController;
+
+use App\Http\Controllers\UserController;
 use Carbon\Factory;
 use Illuminate\Console\View\Components\Factory as ComponentsFactory;
 use Illuminate\Support\Facades\Route;
@@ -8,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 Route::get('/',  function () {
     return view('welcome');
 });
+Route::get('/app',  function () {
+    return view('layouts.app');
+});
+
 
 Route::get('/about',  function () {
     $name = 'Badran';
@@ -35,31 +42,22 @@ Route::post('/about',  function () {
     return view('about', data: compact('name', 'd'));
 });
 
-Route::get('/task',  function () {
-    $tasks = DB::table('tasks')->get();
-    return view('task', data: compact('tasks'));
-});
+Route::get('/task', action: [TaskController::class, 'index']);
 
-Route::post('create',  function () {
-    $taskName = $_POST['name'];
-    DB::table('tasks')->insert(values: ['name' => $taskName]);
-    return redirect()->back();
-});
+Route::post('create', action: [TaskController::class, 'create']);
 
-Route::post('delete/{id}',  function ($id) {
-    DB::table('tasks')->where(column: 'id', operator: $id)->delete();
-    return redirect()->back();
-});
+Route::post('delete/{id}',  action: [TaskController::class, 'destroy']);
 
-Route::post('edit/{id}',  function ($id) {
-    $task  = DB::table('tasks')->where(column: 'id', operator: $id)->first();
-    $tasks = DB::table('tasks')->get();
-    return view('task', data: compact('task', 'tasks'));
-});
+Route::post('edit/{id}',  action: [TaskController::class, 'edit']);
 
-Route::post('update',  function () {
-    $id = $_POST['id'];
-    DB::table('tasks')->where(column: 'id', operator: $id)->update(['name' => $_POST['name']]);
+Route::post('update',  action: [TaskController::class, 'update']);
 
-    return redirect(to: 'task');
-});
+Route::get('/user', action: [UserController::class, 'index']);
+
+Route::post('create', action: [UserController::class, 'create']);
+
+Route::post('delete/{id}',  action: [UserController::class, 'destroy']);
+
+Route::post('edit/{id}',  action: [UserController::class, 'edit']);
+
+Route::post('update',  action: [UserController::class, 'update']);
